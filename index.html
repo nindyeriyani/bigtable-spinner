@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Simulasi BigTable + Spanner — Professional</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header class="header">
+        <div>
+          <h1>Simulasi BigTable + Spanner</h1>
+          <p class="lead">
+            Sistem Data Mahasiswa (simulasi). Spanner-like coordinator
+            menentukan commit time & mencegah duplikasi.
+          </p>
+        </div>
+        <div class="actions">
+          <button id="btnClearLog" class="btn btn-ghost">Clear Log</button>
+        </div>
+      </header>
+
+      <section class="panel grid-2">
+        <form id="form" class="card form-card" autocomplete="off" novalidate>
+          <h2 class="card-title">Input Data Mahasiswa</h2>
+
+          <div class="field">
+            <input id="nim" type="text" required />
+            <label for="nim">NIM</label>
+          </div>
+
+          <div class="field">
+            <input id="nama" type="text" required />
+            <label for="nama">Nama</label>
+          </div>
+
+          <div class="field">
+            <input id="kampus" type="text" />
+            <label for="kampus">Universitas</label>
+          </div>
+
+          <div class="field">
+            <input id="prodi" type="text" />
+            <label for="prodi">Prodi</label>
+          </div>
+
+          <div class="form-controls">
+            <button type="button" id="btnInsertJkt" class="btn btn-primary">
+              Insert → Jakarta
+            </button>
+            <button type="button" id="btnInsertSby" class="btn">
+              Insert → Surabaya
+            </button>
+            <button type="button" id="btnInsertMks" class="btn">
+              Insert → Makassar
+            </button>
+          </div>
+
+          <div class="form-controls">
+            <button type="button" id="btnConflict" class="btn btn-warning">
+              Simulasi Konflik
+            </button>
+            <button type="button" id="btnSync" class="btn">
+              Sync Semua Region
+            </button>
+          </div>
+
+          <div class="small-muted">
+            <label for="delaySby">Delay Surabaya (detik)</label>
+            <input id="delaySby" type="number" min="0" step="0.5" value="0" />
+            <button type="button" id="btnSetDelay" class="btn btn-sm">
+              Set
+            </button>
+          </div>
+
+          <div class="small-muted">
+            <label>Makassar:</label>
+            <button
+              type="button"
+              id="btnToggleMks"
+              class="btn btn-sm btn-danger"
+            >
+              Disconnect Makassar
+            </button>
+          </div>
+
+          <div class="meta">
+            <label>Global Index (NIM → commit time)</label>
+            <pre id="globalIndex" class="box small-pre">{} </pre>
+          </div>
+        </form>
+
+        <aside class="card info-card">
+          <h2 class="card-title">Informasi & Log</h2>
+
+          <div class="status-row">
+            <div class="status">
+              <span id="dotJkt" class="dot online"></span
+              ><strong>Jakarta (Leader)</strong>
+            </div>
+            <div class="status">
+              <span id="dotSby" class="dot online"></span
+              ><strong>Surabaya</strong>
+              <small id="sbyDelayLabel" class="muted"> (delay 0s)</small>
+            </div>
+            <div class="status">
+              <span id="dotMks" class="dot online"></span
+              ><strong>Makassar</strong>
+            </div>
+          </div>
+
+          <div id="log" class="log" aria-live="polite"></div>
+        </aside>
+      </section>
+
+      <section class="regions grid-3">
+        <div class="card region-card">
+          <h3>Jakarta</h3>
+          <div id="jktTable" class="table-wrap"></div>
+        </div>
+
+        <div class="card region-card">
+          <h3>
+            Surabaya
+            <span
+              id="spinnerSby"
+              class="spinner hidden"
+              aria-hidden="true"
+            ></span>
+          </h3>
+          <div id="sbyTable" class="table-wrap"></div>
+        </div>
+
+        <div class="card region-card">
+          <h3>Makassar</h3>
+          <div id="mksTable" class="table-wrap"></div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <small class="muted"
+          >© 2025 Kelompok 3 Sistem Terdistribusi</small
+        >
+      </footer>
+    </main>
+
+    <script src="app.js" type="module"></script>
+  </body>
+</html>
