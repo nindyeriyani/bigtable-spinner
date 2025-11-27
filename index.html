@@ -1,149 +1,158 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Simulasi BigTable + Spanner — Professional</title>
+    <title>Distributed Student Data System (Makassar Region)</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="container">
+    <!-- LOGIN -->
+    <div id="loginPage" class="login-container">
+      <div class="login-card">
+        <h2>Login Sistem</h2>
+        <input id="loginUser" type="text" placeholder="Username" />
+        <input id="loginPass" type="password" placeholder="Password" />
+        <button id="btnLogin" class="btn-primary">Masuk</button>
+        <!-- <p class="login-info">Akun demo: <b>admin / admin123</b></p> -->
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div id="mainPage" class="hidden">
       <header class="header">
-        <div>
-          <h1>Simulasi BigTable + Spanner</h1>
-          <p class="lead">
-            Sistem Data Mahasiswa (simulasi). Spanner-like coordinator
-            menentukan commit time & mencegah duplikasi.
-          </p>
-        </div>
-        <div class="actions">
-          <button id="btnClearLog" class="btn btn-ghost">Clear Log</button>
+        <h1>
+          Distributed Student Data System<br /><span class="subtitle"
+            >Makassar Region</span
+          >
+        </h1>
+        <div class="header-actions">
+          <button id="btnLogout" class="btn-secondary">Logout</button>
         </div>
       </header>
 
-      <section class="panel grid-2">
-        <form id="form" class="card form-card" autocomplete="off" novalidate>
-          <h2 class="card-title">Input Data Mahasiswa</h2>
-
-          <div class="field">
-            <input id="nim" type="text" required />
+      <div class="layout">
+        <!-- LEFT: form, simulasi, log -->
+        <div class="left-column">
+          <!-- Form -->
+          <section class="card">
+            <h2>Input Data Mahasiswa</h2>
             <label for="nim">NIM</label>
-          </div>
+            <input id="nim" type="text" placeholder="e.g. 220209501004" />
 
-          <div class="field">
-            <input id="nama" type="text" required />
             <label for="nama">Nama</label>
-          </div>
+            <input id="nama" type="text" />
 
-          <div class="field">
-            <input id="kampus" type="text" />
-            <label for="kampus">Universitas</label>
-          </div>
+            <label for="kampus">Kampus (pengirim)</label>
+            <select id="kampus">
+              <option value="UNM">UNM (Leader)</option>
+              <option value="UNHAS">UNHAS</option>
+              <option value="UIN">UIN Alauddin</option>
+              <option value="PNUP">PNUP</option>
+              <option value="POLTEKPAR">Poltekpar</option>
+            </select>
 
-          <div class="field">
+            <label for="prodi">Program Studi</label>
             <input id="prodi" type="text" />
-            <label for="prodi">Prodi</label>
-          </div>
 
-          <h2 class="card-title">Skenario (Bukan Fitur)</h2>
-          <div class="form-controls">
-            <button type="button" id="btnInsertJkt" class="btn btn-primary">
-              Insert → Jakarta
-            </button>
-            <button type="button" id="btnInsertSby" class="btn">
-              Insert → Surabaya
-            </button>
-            <button type="button" id="btnInsertMks" class="btn">
-              Insert → Makassar
-            </button>
-          </div>
+            <button id="btnSend" class="btn-primary">Kirim Data</button>
+          </section>
 
-          <div class="form-controls">
-            <button type="button" id="btnConflict" class="btn btn-warning">
-              Simulasi Konflik
-            </button>
-            <button type="button" id="btnSync" class="btn">
-              Sync Semua Region
-            </button>
-          </div>
+          <!-- Simulasi -->
+          <section class="card">
+            <h2>Simulasi Sistem</h2>
+            <div class="sim-row">
+              <div class="sim-item">
+                <label for="delayUnhas">Delay UNHAS (detik)</label>
+                <input
+                  id="delayUnhas"
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  value="0"
+                />
+                <button id="btnSetDelay" class="btn-secondary">
+                  Set Delay
+                </button>
+              </div>
 
-          <div class="small-muted">
-            <label for="delaySby">Delay Surabaya (detik)</label>
-            <input id="delaySby" type="number" min="0" step="0.5" value="0" />
-            <button type="button" id="btnSetDelay" class="btn btn-sm">
-              Set
-            </button>
-          </div>
-
-          <div class="small-muted">
-            <label>Makassar:</label>
-            <button
-              type="button"
-              id="btnToggleMks"
-              class="btn btn-sm btn-danger"
-            >
-              Disconnect Makassar
-            </button>
-          </div>
-
-          <div class="meta">
-            <label>Global Index (NIM → commit time)</label>
-            <pre id="globalIndex" class="box small-pre">{} </pre>
-          </div>
-        </form>
-
-        <aside class="card info-card">
-          <h2 class="card-title">Informasi & Log</h2>
-
-          <div class="status-row">
-            <div class="status">
-              <span id="dotJkt" class="dot online"></span
-              ><strong>Jakarta (Leader)</strong>
+              <div class="sim-item">
+                <label>UIN Alauddin</label>
+                <button id="btnToggleUIN" class="btn-danger">
+                  Disconnect UIN
+                </button>
+              </div>
             </div>
-            <div class="status">
-              <span id="dotSby" class="dot online"></span
-              ><strong>Surabaya</strong>
-              <small id="sbyDelayLabel" class="muted"> (delay 0s)</small>
-            </div>
-            <div class="status">
-              <span id="dotMks" class="dot online"></span
-              ><strong>Makassar</strong>
-            </div>
-          </div>
 
-          <div id="log" class="log" aria-live="polite"></div>
-        </aside>
-      </section>
+            <div class="sim-actions">
+              <button id="btnConflict" class="btn-warning full">
+                Simulasi Konflik (UNM vs UNHAS)
+              </button>
+              <button id="btnSync" class="btn-secondary full">
+                Sync Semua (UNM → semua)
+              </button>
+            </div>
+          </section>
 
-      <section class="regions grid-3">
-        <div class="card region-card">
-          <h3>Jakarta</h3>
-          <div id="jktTable" class="table-wrap"></div>
+          <!-- Log -->
+          <section class="card">
+            <h2>Log Aktivitas Sistem</h2>
+            <div
+              id="logArea"
+              class="log-box"
+              title="Double-click untuk bersihkan"
+            ></div>
+            <div style="display: flex; gap: 8px; margin-top: 10px">
+              <button id="btnClearLog" class="btn-secondary">Clear Log</button>
+              <button id="btnExportLog" class="btn-secondary">
+                Export Log
+              </button>
+            </div>
+          </section>
         </div>
 
-        <div class="card region-card">
-          <h3>
-            Surabaya
-            <span
-              id="spinnerSby"
-              class="spinner hidden"
-              aria-hidden="true"
-            ></span>
-          </h3>
-          <div id="sbyTable" class="table-wrap"></div>
+        <!-- RIGHT: status replikasi -->
+        <div class="right-column">
+          <section class="card">
+            <h2>Status Replikasi Kampus</h2>
+
+            <div class="campus-block">
+              <h3>UNM (Leader)</h3>
+              <p>Status: <span id="statusUNM" class="online">ONLINE</span></p>
+              <div id="tableUNM" class="replica-table"></div>
+            </div>
+
+            <div class="campus-block">
+              <h3>UNHAS</h3>
+              <p>Status: <span id="statusUNHAS" class="online">ONLINE</span></p>
+              <p>Delay: <span id="labelDelayUNHAS">0s</span></p>
+              <div id="tableUNHAS" class="replica-table"></div>
+            </div>
+
+            <div class="campus-block">
+              <h3>UIN Alauddin</h3>
+              <p>Status: <span id="statusUIN" class="online">ONLINE</span></p>
+              <div id="tableUIN" class="replica-table"></div>
+            </div>
+
+            <div class="campus-block">
+              <h3>PNUP</h3>
+              <p>Status: <span id="statusPNUP" class="online">ONLINE</span></p>
+              <div id="tablePNUP" class="replica-table"></div>
+            </div>
+
+            <div class="campus-block">
+              <h3>Poltekpar</h3>
+              <p>
+                Status: <span id="statusPOLTEKPAR" class="online">ONLINE</span>
+              </p>
+              <div id="tablePOLTEKPAR" class="replica-table"></div>
+            </div>
+          </section>
         </div>
+      </div>
+    </div>
 
-        <div class="card region-card">
-          <h3>Makassar</h3>
-          <div id="mksTable" class="table-wrap"></div>
-        </div>
-      </section>
-
-      <footer class="footer">
-        <small class="muted">© 2025 Kelompok 3 Sistem Terdistribusi</small>
-      </footer>
-    </main>
-
-    <script src="app.js" type="module"></script>
+    <script src="app.js"></script>
   </body>
 </html>
